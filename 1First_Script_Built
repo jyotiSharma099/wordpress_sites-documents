@@ -1,0 +1,23 @@
+#!/bin/bash
+
+yum update -y
+mkdir -p /var/www/html/
+sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-07d3e34e55f1faf44.efs.us-east-1.amazonaws.com:/ /var/www/html/
+yum install -y amazon-efs-utils
+echo "fs-07d3e34e55f1faf44.efs.us-east-1.amazonaws.com:/ /var/www/html/ efs defaults,_netdev 0 0"  >> /etc/fstab
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd
+cd /var/www/html/
+wget https://wordpress.org/latest.tar.gz
+ tar -xzf latest.tar.gz
+mv wordpress/* ./
+chown apache:apache ./*
+sudo amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
+cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
+rm -rf index.html
+sed -i 's/database_name_here/wpDB/' /var/www/html/wp-config.php
+sed -i 's/username_here/admin/' /var/www/html/wp-config.php
+sed -i 's/password_here/password/' /var/www/html/wp-config.php
+sed -i 's/localhost/database-1.cwvgkgatdbuz.us-east-1.rds.amazonaws.com/' /var/www/html/wp-config.php
+sudo systemctl restart httpd
