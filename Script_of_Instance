@@ -1,0 +1,5 @@
+#!/bin/bash
+cd /home/ec2-user
+aws s3 cp s3://wordpress-document/wordpress.sh .
+chmod +x /home/ec2-user/wordpress.sh
+/usr/bin/bash /home/ec2-user/wordpress.sh
